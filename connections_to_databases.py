@@ -20,12 +20,16 @@ port = 5432 #kwargs.get()
 db_name = "test_db"#kwargs.get()
 
 
-DATABASE_URL = f"{db_type}://{user}:{password}@{server}:{port}/{db_name}"
+def create_connect():
+    DATABASE_URL = f"{db_type}://{user}:{password}@{server}:{port}/{db_name}"
 
-database = databases.Database(DATABASE_URL)
+    database = databases.Database(DATABASE_URL)
 
-engine = create_engine(DATABASE_URL, echo=True)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    engine = create_engine(DATABASE_URL, echo=True)
+    return engine
+
+def create_session(engine):
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def override_get_db():

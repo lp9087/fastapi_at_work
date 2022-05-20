@@ -1,15 +1,23 @@
 from typing import List
 
+import uvicorn
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 import crud, models, schemas
-from connections_to_databases import override_get_db, database
+# from connections_to_databases import
 from database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app"
+    )
 
 
 # Dependency
@@ -21,15 +29,15 @@ def get_db():
         db.close()
 
 
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-    print("Подключение к базе")
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
+# @app.on_event("startup")
+# async def startup():
+#     await database.connect()
+#     print("Подключение к базе")
+#
+#
+# @app.on_event("shutdown")
+# async def shutdown():
+#     await database.disconnect()
 
 
 @app.get("/db_connect/", response_model=List[schemas.DateBaseInfo])

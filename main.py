@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 import crud, models, schemas
 # from connections_to_databases import
+from connections_to_databases import get_database, db as db1
 from database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
@@ -23,6 +24,15 @@ if __name__ == "__main__":
 # Dependency
 def get_db():
     db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# Dependency
+def get_db_temp():
+    db = get_database()
     try:
         yield db
     finally:
@@ -66,6 +76,17 @@ def delete_connection(connect_id: int, db: Session = Depends(get_db)):
     return crud.delete_db_connect(db=db, connect_id=connect_id)
 
 
-#@app.post("/test/", response_model=schemas.DateBaseInfo)
-#async def get_connections(db_info: schemas.DateBaseCreate, db: Session = Depends(override_get_db)):
-#    await change_engine(db, db_info=db_info)
+@app.post("/test/")#response_model=schemas.DateBaseInfo)
+def get_connections(db_info: schemas.DateBaseCreate, db: Session = Depends(get_db)):
+    db_type = "postgresql+psycopg2" #kwargs.get()
+    user = "portfolio"
+    password = "portfolio"#kwargs.get()
+    server = "localhost"#kwargs.get()
+    port = 54321 #kwargs.get()
+    db_name = "test_db"#kwargs.get()
+    url = f"{db_type}://{user}:{password}@{server}:{port}/{db_name}"
+
+    db1.create_connect(url)
+
+    return {'d':3}
+

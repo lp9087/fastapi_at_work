@@ -1,36 +1,18 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+import sqlalchemy
 
-from service_database import Base
+from service_database import engine
 
-
-class User(Base):
-    __tablename__ = "users"
-
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    is_active = Column(Boolean, default=True)
-
-    items = relationship("Item", back_populates="owner")
+metadata = sqlalchemy.MetaData()
 
 
-class Item(Base):
-    __tablename__ = "items"
+databaseinfo = sqlalchemy.Table(
+    "database_info",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("db_type", sqlalchemy.String),
+    sqlalchemy.Column("db_name", sqlalchemy.String),
+    sqlalchemy.Column("host", sqlalchemy.String),
+    sqlalchemy.Column("port", sqlalchemy.Integer),
+)
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    description = Column(String, index=True)
-    owner_id = Column(Integer, ForeignKey("users.id"))
-
-    owner = relationship("User", back_populates="items")
-
-
-class DataBaseInfo(Base):
-    __tablename__ = "database_info"
-
-    id = Column(Integer, primary_key=True, index=True)
-    db_type = Column(String)
-    db_name = Column(String)
-    host = Column(String)
-    port = Column(Integer)
+metadata.create_all(engine)

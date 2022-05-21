@@ -1,18 +1,14 @@
-import sqlalchemy
+from sqlalchemy import Column, Integer, String
 
-from service_database import engine
-
-metadata = sqlalchemy.MetaData()
+from service_database import Base
 
 
-databaseinfo = sqlalchemy.Table(
-    "database_info",
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("db_type", sqlalchemy.String),
-    sqlalchemy.Column("db_name", sqlalchemy.String),
-    sqlalchemy.Column("host", sqlalchemy.String),
-    sqlalchemy.Column("port", sqlalchemy.Integer),
-)
+class DataBaseInfo(Base):
+    __tablename__ = "database_info"
 
-metadata.create_all(engine)
+    id = Column(Integer, primary_key=True, index=True)
+    db_type = Column(String)
+    db_name = Column(String)
+    host = Column(String)
+    port = Column(Integer)
+

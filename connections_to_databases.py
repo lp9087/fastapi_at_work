@@ -1,23 +1,24 @@
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 # Создание сессии для работы с БД аналитики
 
 
-class DataBase:
+class DataBaseCreate:
     session = None
 
     @classmethod
     def create_connect(cls, url):
-        engine = create_engine(url, echo=True)
-        cls.session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        engine = create_async_engine(url, echo=True)
+        cls.session = sessionmaker(bind=engine, class_=AsyncSession, autocommit=False, autoflush=False)
 
 
-database = DataBase()
+database_con = DataBaseCreate()
 
 
-def get_database():
-    return database.session()
+def get_database_con():
+    return database_con.session()
 
 
 

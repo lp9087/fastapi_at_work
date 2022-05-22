@@ -76,6 +76,4 @@ async def get_data_work_db(db_info: schemas.GetData, db: AsyncSession = Depends(
     request = db_info.sql
     cursor = await db.execute(text(request))
     data = cursor.scalars().first()
-    await db.execute("commit")
-    #await db.refresh()
     return data

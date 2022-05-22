@@ -7,7 +7,7 @@ DATABASE_URL = "sqlite+aiosqlite:///./sql_app_async.db"
 
 
 engine = create_async_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False}
+    DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
 )
 
 SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, autocommit=False, autoflush=False)

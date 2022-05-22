@@ -10,7 +10,7 @@ class DataBaseCreate:
     @classmethod
     def create_connect(cls, url):
         engine = create_async_engine(url, echo=True)
-        cls.session = sessionmaker(bind=engine, class_=AsyncSession, autocommit=False, autoflush=False)
+        cls.session = sessionmaker(bind=engine, class_=AsyncSession, autoflush=False)
 
 
 database_con = DataBaseCreate()

@@ -25,3 +25,7 @@ class DateBaseUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class GetData(BaseModel):
+    sql: str

@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 import crud
 import models
@@ -17,7 +18,7 @@ async def service_db() -> AsyncSession:
         try:
             yield session
         finally:
-            session.close()
+            await session.close()
 
 
 # Создание рабочей сессии для работы с БД аналитики
@@ -26,7 +27,7 @@ async def work_db() -> AsyncSession:
         try:
             yield session_work
         finally:
-            session_work.close()
+            await session_work.close()
 
 
 @router.get("/connect_info/", response_model=List[schemas.DateBaseInfo], tags=["CRUD for Service DB"])
@@ -35,7 +36,7 @@ async def get_connections(db: AsyncSession = Depends(service_db)):
 
 
 @router.post("/connect_info/", response_model=schemas.DateBaseInfo, tags=["CRUD for Service DB"])
-async def create_db_connection(db_info: schemas.DateBaseCreate, db: AsyncSession = Depends(work_db)):
+async def create_db_connection(db_info: schemas.DateBaseCreate, db: AsyncSession = Depends(service_db)):
     return await crud.create_db_connect(db_info=db_info, db=db)
 
 
@@ -55,8 +56,8 @@ async def delete_connection(connect_id: int, db: AsyncSession = Depends(service_
     return await crud.delete_db_connect(connect_id=connect_id, db=db)
 
 
-@router.post("/create_connect/", tags=["Check connect to DB"])
-async def create_connections(db_info: schemas.DateBaseCreate, db: AsyncSession = Depends(service_db)):
+@router.post("/create_connect_work_db/", tags=["Check connect to DB"])
+async def create_connection_work_db(db_info: schemas.DateBaseCreate, db: AsyncSession = Depends(service_db)):
     db_type = "postgresql+asyncpg"  # kwargs.get()
     user = "kirill"
     password = "kirill"  # kwargs.get()
@@ -67,4 +68,14 @@ async def create_connections(db_info: schemas.DateBaseCreate, db: AsyncSession =
 
     database_con.create_connect(url)
 
-    return {'d': 3}
+    return {"Connection": "Complete"}
+
+
+@router.post("/get_data_work_db/", tags=["Check connect to DB"])
+async def get_data_work_db(db_info: schemas.GetData, db: AsyncSession = Depends(work_db)):
+    request = db_info.sql
+    cursor = await db.execute(text(request))
+    data = cursor.scalars().first()
+    await db.execute("commit")
+    #await db.refresh()
+    return data
